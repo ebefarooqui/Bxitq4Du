@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -17,9 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={cn('min-h-screen bg-background text-foreground antialiased', inter.className)}>
-        <main className="max-w-2xl mx-auto px-4 py-10">
-          {children}
+      <body className={cn('h-screen bg-background text-foreground antialiased', inter.className)}>
+        <main className="h-full flex flex-col items-center">
+          <div className="w-full max-w-2xl h-full flex flex-col">
+            {children}
+          </div>
         </main>
       </body>
     </html>

@@ -21,7 +21,7 @@ export function CommentForm({ onSubmit, disabled }: CommentFormProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 p-2">
       <Textarea
         placeholder="Write a comment..."
         value={text}

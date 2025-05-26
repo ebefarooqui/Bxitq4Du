@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
-import {Collapsible} from '@/components/Collapsible'
+import { AnimatePresence, motion } from "framer-motion";
 
 type CommentNodeProps = {
   comment: CommentTree
@@ -23,6 +23,7 @@ export function CommentNode({
 }: CommentNodeProps) {
   const [showReply, setShowReply] = useState(false)
   const [replyText, setReplyText] = useState('')
+
 
   const handleReply = () => {
     if (replyText.trim()) {
@@ -49,7 +50,6 @@ export function CommentNode({
               >
                 {showReply ? 'Cancel' : 'Reply'}
               </Button>
-              
 {comment.children.length > 0 && (
   <Button
     variant="ghost"
@@ -60,42 +60,65 @@ export function CommentNode({
     {comment.isVisible ? 'Hide' : 'Show'}
   </Button>
 )}
-
               <ConfirmDeleteDialog onConfirm={() => onDelete(comment.id)} />
             </div>
           </div>
-          <Collapsible isOpen={showReply}>
-          <div className="space-y-3 pt-3">
-              <Textarea
-                placeholder="Write a reply..."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                className="text-sm"
-              />
-              <div className="flex justify-end">
-              <Button size="sm" variant="secondary" onClick={handleReply}>
-                Post Reply
-              </Button>
-                </div>
-          </div>
-          </Collapsible>
+         <AnimatePresence initial={false}>
+  {showReply && (
+    <motion.div
+      key="reply"
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+    >
+      <div className="space-y-3 pt-3">
+        <Textarea
+          placeholder="Write a reply..."
+          value={replyText}
+          onChange={(e) => setReplyText(e.target.value)}
+          className="text-sm"
+        />
+        <div className="flex justify-end">
+          <Button size="sm" variant="secondary" onClick={handleReply}>
+            Post Reply
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
         </CardContent>
       </Card>
 
       {/* Recursive children */} 
-<Collapsible isOpen={comment.isVisible} className="ml-4 border-l pl-4 border-muted">
-  <div className="space-y-4">
-    {comment.children.map((child) => (
-      <CommentNode
-        key={child.id}
-        comment={child}
-        onReply={onReply}
-        onDelete={onDelete}
-        onToggle={onToggle}
-      />
-    ))}
-  </div>
-</Collapsible>
+
+<AnimatePresence initial={false}>
+  {comment.isVisible && (
+    <motion.div
+      key="children"
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      className="overflow-hidden ml-4 border-l pl-4 border-muted"
+    >
+      <div className="space-y-4">
+        {comment.children.map((child) => (
+          <CommentNode
+            key={child.id}
+            comment={child}
+            onReply={onReply}
+            onDelete={onDelete}
+            onToggle={onToggle}
+          />
+        ))}
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
     </div>
   )
 }
