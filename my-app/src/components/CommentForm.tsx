@@ -21,14 +21,14 @@ export function CommentForm({ onSubmit, disabled }: CommentFormProps) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <Textarea
         placeholder="Write a comment..."
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
       <div className="flex justify-end">
-        <Button onClick={handleSubmit} size="sm" disabled={disabled}>
+        <Button onClick={handleSubmit} size="sm" className="bg-blue-600 text-white hover:bg-blue-700" disabled={disabled}>
           Post Comment
         </Button>
       </div>

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
+import {Collapsible} from '@/components/Collapsible'
 
 type CommentNodeProps = {
   comment: CommentTree
@@ -32,50 +33,69 @@ export function CommentNode({
   }
 
   return (
-    <div className="ml-4 mt-4">
+    <div className="ml-4 mt-4 space-y-4">
       <Card className="w-full">
         <CardContent className="p-4 space-y-2">
-          <p className="text-sm">{comment.text}</p>
-          <p className="text-xs text-muted-foreground">
-           {new Date(comment.createdAt).toLocaleString()}
-          </p>
+          <p className="text-sm text-foreground">{comment.text}</p>
 
-          <div className="flex gap-2 text-xs">
-            <Button variant="ghost" size="sm" onClick={() => setShowReply(!showReply)}>
-              {showReply ? 'Cancel' : 'Reply'}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => onToggle(comment.id)}>
-              {comment.isVisible ? 'Hide' : 'Show'}
-            </Button>
-            <ConfirmDeleteDialog onConfirm={() => onDelete(comment.id)} />
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{new Date(comment.createdAt).toLocaleString()}</span>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={() => setShowReply(!showReply)}
+              >
+                {showReply ? 'Cancel' : 'Reply'}
+              </Button>
+              
+{comment.children.length > 0 && (
+  <Button
+    variant="ghost"
+    size="sm"
+    className="text-xs"
+    onClick={() => onToggle(comment.id)}
+  >
+    {comment.isVisible ? 'Hide' : 'Show'}
+  </Button>
+)}
+
+              <ConfirmDeleteDialog onConfirm={() => onDelete(comment.id)} />
+            </div>
           </div>
-
-          {showReply && (
-            <div className="space-y-2 pt-2">
+          <Collapsible isOpen={showReply}>
+          <div className="space-y-3 pt-3">
               <Textarea
                 placeholder="Write a reply..."
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
+                className="text-sm"
               />
-              <Button size="sm" onClick={handleReply}>
+              <div className="flex justify-end">
+              <Button size="sm" variant="secondary" onClick={handleReply}>
                 Post Reply
               </Button>
-            </div>
-          )}
+                </div>
+          </div>
+          </Collapsible>
         </CardContent>
       </Card>
 
-      {/* Recursive children rendering */}
-      {comment.isVisible &&
-        comment.children.map((child) => (
-          <CommentNode
-            key={child.id}
-            comment={child}
-            onReply={onReply}
-            onDelete={onDelete}
-            onToggle={onToggle}
-          />
-        ))}
+      {/* Recursive children */} 
+<Collapsible isOpen={comment.isVisible} className="ml-4 border-l pl-4 border-muted">
+  <div className="space-y-4">
+    {comment.children.map((child) => (
+      <CommentNode
+        key={child.id}
+        comment={child}
+        onReply={onReply}
+        onDelete={onDelete}
+        onToggle={onToggle}
+      />
+    ))}
+  </div>
+</Collapsible>
     </div>
   )
 }

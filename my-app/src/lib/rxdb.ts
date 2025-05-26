@@ -9,6 +9,7 @@ import {
 
 import { getRxStorageLocalstorage } from 'rxdb/plugins/storage-localstorage';
 import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update'
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv'
 import { commentSchema, CommentDocType } from './schema'
 
@@ -23,9 +24,9 @@ if (process.env.NODE_ENV === 'development') {
   addRxPlugin(RxDBDevModePlugin)
 }
 
+addRxPlugin(RxDBUpdatePlugin);
+
 let dbPromise: Promise<CommentDatabase> | null = null
-
-
 
 export const getDB = async (): Promise<CommentDatabase> => {
   if (!dbPromise) {

@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
-import ToasterClient from '@/components/ToasterClient'
-import ClientOnly from '@/components/ClientOnly'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,9 +21,6 @@ export default function RootLayout({
         <main className="max-w-2xl mx-auto px-4 py-10">
           {children}
         </main>
-        <ClientOnly>
-          <ToasterClient />
-        </ClientOnly>
       </body>
     </html>
   )
