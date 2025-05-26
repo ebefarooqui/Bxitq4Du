@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "rxdb/plugins/storage-idb": ["node_modules/rxdb/dist/esm/plugins/storage-idb/index.js"],
+      "rxdb/plugins/dev-mode": ["node_modules/rxdb/dist/esm/plugins/dev-mode/index.js"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
