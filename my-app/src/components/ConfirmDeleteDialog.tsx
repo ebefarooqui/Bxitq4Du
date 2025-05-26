@@ -42,7 +42,7 @@ export function ConfirmDeleteDialog({ onConfirm }: ConfirmDeleteDialogProps) {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleConfirm}>
-            Delete
+            Confirm
           </Button>
         </DialogFooter>
       </DialogContent>

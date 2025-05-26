@@ -89,7 +89,7 @@ describe('<CommentNode />', () => {
     expect(onToggle).toHaveBeenCalledWith('1')
   })
 
-  it('calls onDelete when delete is confirmed', () => {
+  it('calls onDelete when the dialog confirm is clicked', async () => {
     const onDelete = jest.fn()
 
     render(
@@ -103,8 +103,9 @@ describe('<CommentNode />', () => {
 
     fireEvent.click(screen.getByText('Delete'))
 
-    // Assuming the dialog opens and contains a "Confirm" button
-    fireEvent.click(screen.getByText('Confirm'))
+    // Wait for dialog to open and confirm button to appear
+    const confirmBtn = await screen.findByText('Confirm')
+    fireEvent.click(confirmBtn)
 
     expect(onDelete).toHaveBeenCalledWith('1')
   })
