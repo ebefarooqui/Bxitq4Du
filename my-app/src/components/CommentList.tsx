@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useComments } from '@/lib/useComments'
