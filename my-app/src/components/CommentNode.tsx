@@ -64,7 +64,7 @@ export function CommentNode({
               <ConfirmDeleteDialog onConfirm={() => onDelete(comment.id)} />
             </div>
           </div>
-
+          {/* Using Framer Motion for animations */}
           <AnimatePresence initial={false}>
             {showReply && (
               <motion.div

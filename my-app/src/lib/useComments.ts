@@ -3,14 +3,13 @@
 import { useEffect, useState } from 'react'
 import { getDB } from './rxdb'
 import { CommentDocType } from './schema'
-import { toast } from '@/hooks/use-toast'
 
 export type CommentTree = CommentDocType & {
   children: CommentTree[]
 }
 
 // Helper: builds a nested comment tree from flat list
-function buildCommentTree(flat: CommentDocType[]): CommentTree[] {
+export function buildCommentTree(flat: CommentDocType[]): CommentTree[] {
   const lookup: Record<string, CommentTree> = {}
   const roots: CommentTree[] = []
 
@@ -31,27 +30,32 @@ function buildCommentTree(flat: CommentDocType[]): CommentTree[] {
 
 export function useComments() {
   const [comments, setComments] = useState<CommentTree[]>([])
-
-  
   const [dbReady, setDbReady] = useState(false)
 
-  
   useEffect(() => {
     let sub: any
     let mounted = true
 
-    getDB().then((db) => {
-      setDbReady(true)
+    getDB()
+      .then((db) => {
+        setDbReady(true)
 
-      const observable = db.comments.find().$.subscribe((docs) => {
-        if (!mounted) return
-        const json = docs.map((d) => d.toJSON())
-        const tree = buildCommentTree(json)
-        setComments(tree)
+        const observable = db.comments.find().$.subscribe((docs) => {
+          if (!mounted) return
+          try {
+            const json = docs.map((d) => d.toJSON())
+            const tree = buildCommentTree(json)
+            setComments(tree)
+          } catch (err) {
+            console.error('Failed to process subscription docs', err)
+          }
+        })
+
+        sub = observable
       })
-
-      sub = observable
-    })
+      .catch((err) => {
+        console.error('Failed to initialize DB in useEffect', err)
+      })
 
     return () => {
       mounted = false
@@ -59,73 +63,83 @@ export function useComments() {
     }
   }, [])
 
-
-
   const refreshComments = async () => {
-    const db = await getDB()
-    const docs = await db.comments.find().exec()
-    const json = docs.map((d) => d.toJSON())
-    setComments(buildCommentTree(json))
+    try {
+      const db = await getDB()
+      const docs = await db.comments.find().exec()
+      const json = docs.map((d) => d.toJSON())
+      setComments(buildCommentTree(json))
+    } catch (err) {
+      console.error('Failed to refresh comments', err)
+    }
   }
 
   const addComment = async (text: string, parentId?: string) => {
-    const db = await getDB()
-    await db.comments.insert({
-      id: crypto.randomUUID(),
-      text,
-      createdAt: Date.now(),
-      parentId,
-      isVisible: true
-    })
-    await refreshComments() // ⬅️ Force UI update
+    try {
+      const db = await getDB()
+      await db.comments.insert({
+        id: crypto.randomUUID(),
+        text,
+        createdAt: Date.now(),
+        parentId,
+        isVisible: true
+      })
+      await refreshComments()
+    } catch (err) {
+      console.error('Failed to add comment', err)
+    }
   }
 
   const deleteComment = async (id: string) => {
-    const db = await getDB()
+    try {
+      const db = await getDB()
+      const allDocs = await db.comments.find().exec()
+      const all = allDocs.map(doc => doc.toJSON())
 
-    // Load all comments
-    const allDocs = await db.comments.find().exec()
-    const all = allDocs.map(doc => doc.toJSON())
+      const toDelete = new Set<string>()
 
-    // Collect all child comment IDs recursively
-    const toDelete = new Set<string>()
-
-    const collectDescendants = (currentId: string) => {
-      toDelete.add(currentId)
-      for (const comment of all) {
-        if (comment.parentId === currentId) {
-          collectDescendants(comment.id)
+      const collectDescendants = (currentId: string) => {
+        toDelete.add(currentId)
+        for (const comment of all) {
+          if (comment.parentId === currentId) {
+            collectDescendants(comment.id)
+          }
         }
       }
+
+      collectDescendants(id)
+
+      await Promise.all(
+        Array.from(toDelete).map(async (deleteId) => {
+          try {
+            const doc = await db.comments.findOne({ selector: { id: deleteId } }).exec()
+            if (doc) await doc.remove()
+          } catch (err) {
+            console.error(`Failed to remove comment with id ${deleteId}`, err)
+          }
+        })
+      )
+
+      await refreshComments()
+    } catch (err) {
+      console.error('Failed to delete comment tree', err)
     }
-
-    collectDescendants(id)
-
-    // Remove them all
-    await Promise.all(
-      [...toDelete].map(async (deleteId) => {
-        const doc = await db.comments.findOne({ selector: { id: deleteId } }).exec()
-        if (doc) await doc.remove()
-      })
-    )
-
-    await refreshComments()
-    toast({
-      description: 'All nested replies were removed.'
-    })
   }
 
-
   const toggleVisibility = async (id: string) => {
-    const db = await getDB()
-    const doc = await db.comments.findOne({ selector: { id } }).exec()
-    if (doc) {
-      await doc.update({
-        $set: {
-          isVisible: !doc.get('isVisible')
-        }
-      })
-      await refreshComments()
+    try {
+      const db = await getDB()
+      const doc = await db.comments.findOne({ selector: { id } }).exec()
+      if (doc) {
+        await doc.update({
+          $set: {
+            isVisible: !doc.get('isVisible')
+          }
+        })
+        await refreshComments()
+      }
+    } catch (err) {
+      console.error(`Failed to toggle visibility for comment ${id}`, err)
     }
   }
 

@@ -7,7 +7,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
+  DialogDescription
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
@@ -33,6 +34,9 @@ export function ConfirmDeleteDialog({ onConfirm }: ConfirmDeleteDialogProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete comment?</DialogTitle>
+          <DialogDescription className="sr-only">
+            This action cannot be undone. This will permanently delete your comment.
+          </DialogDescription>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
           This will delete the comment and all of its replies. This action cannot be undone.
