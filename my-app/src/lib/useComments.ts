@@ -24,6 +24,8 @@ export function buildCommentTree(flat: CommentDocType[]): CommentTree[] {
       roots.push(lookup[c.id])
     }
   }
+  
+  roots.sort((a, b) => b.createdAt - a.createdAt)
 
   return roots
 }

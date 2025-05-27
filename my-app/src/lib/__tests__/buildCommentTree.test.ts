@@ -11,8 +11,8 @@ describe('buildCommentTree', () => {
     const tree = buildCommentTree(flat)
 
     expect(tree.length).toBe(2)
-    expect(tree[0].id).toBe('1')
-    expect(tree[0].children[0].id).toBe('2')
-    expect(tree[1].id).toBe('3')
+    expect(tree[0].id).toBe('3')
+    expect(tree[1].children[0].id).toBe('2')
+    expect(tree[1].id).toBe('1')
   })
 })
