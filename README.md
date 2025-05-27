@@ -55,7 +55,8 @@ Animations: Framer Motion
 
 Testing: @testing-library/react, jest, ts-jest
 
-🧪 Running Tests
+## 🧪 Running Tests
+
 To run the test suite:
 
 ```bash
