@@ -1,4 +1,4 @@
-# 🧵 Reddit-Style Nested Comment System
+# 🧵 Nested Comment System
 
 This is a [Next.js](https://nextjs.org/) app built with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), showcasing a **local-first, nested comment thread** with RxDB persistence and a polished UI built with [shadcn/ui](https://ui.shadcn.com/).
 
